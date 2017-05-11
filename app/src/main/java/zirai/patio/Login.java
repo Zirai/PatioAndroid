@@ -23,6 +23,7 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONObject;
 
+import java.io.BufferedReader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -45,36 +46,15 @@ public class Login extends AppCompatActivity {
 
 
     public void submitLogin(View view){
-        httpClient client = new httpClient("https://ziraipatio.herokuapp.com/api/appData");
+        httpClient client = new httpClient("https://ziraipatio.herokuapp.com/androidLogin");
 
-
-
-//        Log.e("1", res);
         EditText username = (EditText)findViewById(R.id.login_id);
         EditText password = (EditText)findViewById(R.id.login_pw);
         String strUsername = username.getText().toString();
         String strPassword = password.getText().toString();
         // client.execute(strUsername, strPassword);
         Intent intent = new Intent(this, homePage.class);
-        JSONObject jo = new JSONObject();
-        JSONArray ja = new JSONArray();
-        try{
-            jo.put("appName", "Spin'zer for Kids");
-            jo.put("image", "https://puu.sh/vLmqa/63f1137485.png");
 
-            ja.put(jo);
-
-            jo = new JSONObject();
-            jo.put("appName", "Angry Gorilla");
-            jo.put("image", "https://puu.sh/vMu8I/935de3032f.jpg");
-
-            ja.put(jo);
-        } catch (Exception e)
-        {
-
-        }
-
-        intent.putExtra("JSON", ja.toString());
         startActivity(intent);
     }
 
@@ -87,24 +67,34 @@ public class Login extends AppCompatActivity {
 
         protected String doInBackground(String... params) {
 
-            HttpClient httpclient = new DefaultHttpClient();
-            HttpPost httppost = new HttpPost(u);
-
+            BufferedReader inBuffer = null;
+            String result = "fail";
             try {
-                // Add your data
-                List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
+                HttpClient httpClient = new DefaultHttpClient();
+                HttpPost request = new HttpPost(u);
+                List<NameValuePair> postParameters = new ArrayList<NameValuePair>();
+                postParameters.add(new BasicNameValuePair("name", params[0]));
 
-                nameValuePairs.add(new BasicNameValuePair("username", params[0]));
-                nameValuePairs.add(new BasicNameValuePair("password", params[1]));
-                httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
+                UrlEncodedFormEntity formEntity = new UrlEncodedFormEntity(
+                        postParameters);
 
-                // Execute HTTP Post Request
-                HttpResponse response = httpclient.execute(httppost);
+                request.setEntity(formEntity);
+                httpClient.execute(request);
+                result="got it";
 
-            } catch (Exception e) {
-                Log.e("Post error: ", e.toString());
+            } catch(Exception e) {
+                // Do something about exceptions
+                result = e.getMessage();
+            } finally {
+                if (inBuffer != null) {
+                    try {
+                        inBuffer.close();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
             }
-            return "";
+            return  result;
         }
 
         protected void onPostExecute(String response) {
