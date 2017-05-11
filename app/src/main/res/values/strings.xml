@@ -2,5 +2,5 @@
     <string name="app_name">Patio</string>
     <string name="loginID">Username</string>
     <string name="loginPW">Password</string>
-    <string name="button_send">Send</string>
+    <string name="button_login">Login</string>
 </resources>
